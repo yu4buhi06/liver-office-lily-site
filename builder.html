@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Builder - Liver Office Lily</title>
+    <!-- Include GrapesJS CSS from CDN -->
+    <link rel="stylesheet" href="https://unpkg.com/grapesjs/dist/css/grapes.min.css">
+    <style>
+        /* Basic layout for full-screen editor */
+        body, html {
+            height: 100%;
+            margin: 0;
+        }
+        #editor {
+            height: 100vh;
+        }
+    </style>
+</head>
+<body>
+    <!-- GrapesJS editor container -->
+    <div id="editor"></div>
+    <!-- Include GrapesJS and preset plugin from CDN -->
+    <script src="https://unpkg.com/grapesjs"></script>
+    <script src="https://unpkg.com/grapesjs-preset-webpage"></script>
+    <script>
+        // Initialize GrapesJS editor
+        const editor = grapesjs.init({
+            container: '#editor',
+            height: '100vh',
+            fromElement: false,
+            storageManager: false,
+            // Load basic webpage preset for common blocks and styling options
+            plugins: ['gjs-preset-webpage'],
+            pluginsOpts: {
+                'gjs-preset-webpage': {}
+            }
+        });
+
+        // Fetch existing site HTML and CSS to use as the starting template
+        Promise.all([
+            fetch('index.html').then(res => res.text()),
+            fetch('styles.css').then(res => res.text())
+        ]).then(([html, css]) => {
+            editor.setComponents(html);
+            editor.setStyle(css);
+        }).catch((err) => {
+            console.error('Failed to load default site', err);
+        });
+
+        // Add a save button to export the edited page as a single HTML file with inline CSS
+        editor.Panels.addButton('options', [{
+            id: 'save',
+            className: 'fa fa-save',
+            label: 'Save HTML',
+            command: function(ed) {
+                const html = ed.getHtml();
+                const css = ed.getCss();
+                // Build complete HTML document with inline CSS
+                const fullHtml = '<!DOCTYPE html><html lang="ja"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Liver Office Lily - \u7de8\u96c6\u30da\u30fc\u30b8</title><style>' + css + '</style></head><body>' + html + '</body></html>';
+                const blob = new Blob([fullHtml], { type: 'text/html' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = 'edited_page.html';
+                // Trigger download
+                link.click();
+                // Clean up the temporary URL
+                URL.revokeObjectURL(link.href);
+            }
+        }]);
+    </script>
+</body>
+</html>
