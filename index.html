@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liver Office Lily – 模倣サイト</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Google Fonts for clean typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <script>
+        // Simple client-side editor functionality
+        document.addEventListener('DOMContentLoaded', () => {
+            const editBtn = document.getElementById('toggleEdit');
+            const saveBtn = document.getElementById('savePage');
+            const editableElements = document.querySelectorAll('[data-editable]');
+            const imageInputs = document.querySelectorAll('.image-input');
+
+            function toggleEdit() {
+                const editing = editBtn.getAttribute('data-editing') === 'true';
+                // toggle contenteditable on text elements
+                editableElements.forEach(el => {
+                    el.contentEditable = !editing;
+                    el.style.borderBottom = !editing ? '1px dashed #c83c55' : 'none';
+                });
+                // show or hide image input controls
+                imageInputs.forEach(input => {
+                    input.style.display = editing ? 'none' : 'block';
+                });
+                editBtn.textContent = editing ? '編集モード開始' : '編集モード終了';
+                editBtn.setAttribute('data-editing', editing ? 'false' : 'true');
+                // show save button when editing
+                saveBtn.style.display = editing ? 'none' : 'inline-block';
+            }
+            editBtn.addEventListener('click', toggleEdit);
+            // handle image changes
+            imageInputs.forEach(input => {
+                input.addEventListener('change', (e) => {
+                    const targetId = e.target.getAttribute('data-target');
+                    const file = e.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = function(ev) {
+                            const img = document.getElementById(targetId);
+                            img.src = ev.target.result;
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+            });
+            // save function: downloads current HTML
+            saveBtn.addEventListener('click', () => {
+                // remove editing UI before saving
+                editableElements.forEach(el => {
+                    el.removeAttribute('contenteditable');
+                    el.style.borderBottom = 'none';
+                });
+                imageInputs.forEach(input => {
+                    input.style.display = 'none';
+                });
+                editBtn.style.display = 'none';
+                saveBtn.style.display = 'none';
+                const blob = new Blob([document.documentElement.outerHTML], {type: 'text/html'});
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'edited_index.html';
+                a.click();
+                URL.revokeObjectURL(url);
+                // restore editing UI
+                editBtn.style.display = 'inline-block';
+                editBtn.textContent = '編集モード開始';
+                editBtn.setAttribute('data-editing', 'false');
+            });
+        });
+    </script>
+</head>
+<body>
+    <!-- Header with navigation -->
+    <header class="site-header" id="top">
+        <div class="container">
+            <h1 class="logo">Liver Office Lily</h1>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="#about">ABOUT</a></li>
+                    <li><a href="#liver">LIVERとは</a></li>
+                    <li><a href="#points">POINT</a></li>
+                    <li><a href="#faq">FAQ</a></li>
+                    <li><a href="#contact">CONTACT</a></li>
+                </ul>
+            </nav>
+            <!-- Edit buttons -->
+            <div class="edit-controls">
+                <button id="toggleEdit" data-editing="false">編集モード開始</button>
+                <button id="savePage" style="display:none;">保存してダウンロード</button>
+            </div>
+        </div>
+    </header>
+    <!-- Hero section with background image and tagline -->
+    <section class="hero">
+        <div class="container">
+            <h2 data-editable>新たなライバー人生の挑戦へ</h2>
+            <p data-editable>あなたの夢を私たちと共に叶えてみませんか？</p>
+        </div>
+    </section>
+    <!-- About section -->
+    <section class="about" id="about">
+        <div class="container">
+            <h2 data-editable>What's the Lily</h2>
+            <div class="about-content">
+                <div class="about-text">
+                    <p data-editable>『Lily』は大人気ライバー・橘エリカが代表取締役を務めるライバー事務所です。「新たなライバー人生の挑戦に向けて寄り添う」をコンセプトに新規育成に力を入れ、年齢や怦別を問わずライバーとして活躍したい人のサポートを行います。</p>
+                    <p data-editable>『Lily』とは百合の花を意味し、「長続きする幸せ」「白髪になるまで末永く平和である」という意味が込められています。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Liver section -->
+    <section class="liver" id="liver">
+        <div class="container">
+            <h2>What's the Liver</h2>
+            <p>ライバーとは、TikTokや17LIVE等様々なツールでライブ配信をする人のことです。スマホ１台と通信環境さえ整えれば、いつでもどこででもライブ配信ができます。トーク・趣味・特技など、自分の好きなことを配信し、夢を叶えましょう！</p>
+        </div>
+    </section>
+    <!-- Points section -->
+    <section class="points" id="points">
+        <div class="container">
+            <h2>Lily's Point</h2>
+            <ul class="point-list">
+                <li data-editable><strong>最新情報を提供：</strong>代表・橘エリカが現役ライバーなので、今まさに！の情報をお伝えできます。</li>
+                <li data-editable><strong>ノルマなし：</strong>ノルマは完全にナシ！未経験でもOK。</li>
+                <li data-editable><strong>手厚いサポート：</strong>初心者から経験者まで１から徹底サポート。自宅で収入を得たい方、ママさんライバー、人気者になりたい方大歓迎！</li>
+                <li data-editable><strong>ボーナス制度：</strong>頑張ってくれたライバーには代表からボーナス支給。頑張り次第でプレゼントも！</li>
+            </ul>
+        </div>
+    </section>
+    <!-- FAQ section -->
+    <section class="faq" id="faq">
+        <div class="container">
+            <h2>よくある質問</h2>
+            <details>
+                <summary data-editable>Lilyに所属するのに契約料や初期費用はかかりますか？</summary>
+                <p data-editable>一切かかりません。</p>
+            </details>
+            <details>
+                <summary data-editable>ライブ配信はどんなことをするの？</summary>
+                <p data-editable>趣味・歌・演奏・ゲームなどご自身の好きなことを配信していただけます。</p>
+            </details>
+            <details>
+                <summary data-editable>話すことが思い浮かびません。大丈夫でしょうか？</summary>
+                <p data-editable>大丈夫です！最初はそう思われる方が多いですが、リスナーからの質問に応えたり、好きなことについて語ったりしているうちに慣れていきます。もちろん事務所からのサポートもあります！</p>
+            </details>
+            <details>
+                <summary data-editable>配信時間やノルマはありますか？</summary>
+                <p data-editable>一切ございません。</p>
+            </details>
+            <details>
+                <summary data-editable>未経験で不安です。</summary>
+                <p data-editable>初めは不安が大きいと思いますが、ご相談・ご質問などしていただきやすい環境を整えております。事務所が全力でサポートいたします。</p>
+            </details>
+            <details>
+                <summary data-editable>確定申告はどうしたらいいですか？</summary>
+                <p data-editable>事務所にご相談していただけますので、お気軽にお尋ねください。</p>
+            </details>
+        </div>
+    </section>
+    <!-- Contact section -->
+    <section class="contact" id="contact">
+        <div class="container">
+            <h2 data-editable>お問い合わせ</h2>
+            <p data-editable>ご質問やご相談はお気軽にご連絡ください。</p>
+            <form>
+                <div class="form-group">
+                    <label for="name">お名前</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">メールアドレス</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="message">メッセージ</label>
+                    <textarea id="message" name="message" rows="4" required></textarea>
+                </div>
+                <button type="submit">送信</button>
+            </form>
+        </div>
+    </section>
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="container">
+            <p>&copy; 2026 Liver Office Lily</p>
+        </div>
+    </footer>
+</body>
+</html>
